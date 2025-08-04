@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terabox Pro • Advanced File Fetcher</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 60%, rgba(34, 197, 94, 0.1) 0%, transparent 50%);
+      animation: float 20s ease-in-out infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33% { transform: translateY(-20px) rotate(1deg); }
+      66% { transform: translateY(10px) rotate(-1deg); }
+    }
+
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 28px;
+      box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .title {
+      font-size: 32px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 4s ease-in-out infinite;
+      margin-bottom: 8px;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .subtitle {
+      color: #94a3b8;
+      font-size: 16px;
+      font-weight: 400;
+    }
+
+    .input-section {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 32px 24px;
+      margin-bottom: 24px;
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .input-label {
+      display: block;
+      color: #cbd5e1;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 12px;
+      padding-left: 4px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 18px 24px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 400;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      outline: none;
+    }
+
+    .input-field:focus {
+      border-color: #3b82f6;
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .input-field::placeholder {
+      color: #64748b;
+    }
+
+    .fetch-button {
+      width: 100%;
+      padding: 20px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border: none;
+      border-radius: 16px;
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      text-transform: none;
+      letter-spacing: 0.5px;
+      box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+    }
+
+    .fetch-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(59, 130, 246, 0.4);
+    }
+
+    .fetch-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #ffffff;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 12px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .result-section {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 32px 24px;
+      margin-bottom: 24px;
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      transform: scale(0.95);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .result-section.show {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .file-info {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .file-name {
+      font-size: 20px;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 8px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .file-size {
+      color: #94a3b8;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .media-container {
+      position: relative;
+      margin: 24px 0;
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .thumbnail {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 16px;
+      transition: transform 0.3s ease;
+    }
+
+    .video-player {
+      width: 100%;
+      border-radius: 16px;
+      background: #000000;
+      outline: none;
+    }
+
+    .play-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80px;
+      height: 80px;
+      background: rgba(59, 130, 246, 0.9);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .play-overlay:hover {
+      background: rgba(59, 130, 246, 1);
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    .play-icon {
+      width: 0;
+      height: 0;
+      border-left: 24px solid #ffffff;
+      border-top: 14px solid transparent;
+      border-bottom: 14px solid transparent;
+      margin-left: 4px;
+    }
+
+    .download-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .download-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 20px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .download-btn.primary {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3);
+    }
+
+    .download-btn.secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .download-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .error-message {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 16px;
+      padding: 20px;
+      color: #fca5a5;
+      font-size: 15px;
+      line-height: 1.5;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 16px;
+      }
+      
+      .title {
+        font-size: 28px;
+      }
+      
+      .input-section {
+        padding: 24px 20px;
+      }
+      
+      .result-section {
+        padding: 24px 20px;
+      }
+      
+      .download-section {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      
+      .file-name {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 3H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+        </svg>
+      </div>
+      <h1 class="title">Terabox Pro</h1>
+      <p class="subtitle">Advanced file fetcher with professional UI</p>
+    </div>
+
+    <div class="input-section">
+      <div class="input-group">
+        <label class="input-label">Terabox Share URL</label>
+        <input 
+          type="text" 
+          id="linkInput" 
+          class="input-field" 
+          placeholder="Paste your Terabox URL here..."
+          autocomplete="off"
+          spellcheck="false"
+        >
+      </div>
+      
+      <button class="fetch-button" id="fetchBtn" onclick="fetchVideo()">
+        <span id="btnText">Find & Fetch File</span>
+      </button>
+    </div>
+
+    <div id="errorContainer"></div>
+    <div id="resultContainer"></div>
+  </div>
+
+  <script>
+    const API_ENDPOINT = "https://terabox.ashlynn.workers.dev/";
+    const DEFAULT_NDUS = "ndus=YyMdTeyteHuihWw817BbpYUS73SQXx9P6ws1NyaU";
+    
+    function isVideoFile(filename) {
+      return /\.(mp4|webm|mkv|avi|mov|flv|wmv|m4v|3gp)$/i.test(filename);
+    }
+    
+    function showError(message) {
+      const errorContainer = document.getElementById('errorContainer');
+      errorContainer.innerHTML = `<div class="error-message">${message}</div>`;
+      setTimeout(() => {
+        errorContainer.innerHTML = '';
+      }, 5000);
+    }
+    
+    function playVideo(videoUrl, thumbnail) {
+      const mediaContainer = document.querySelector('.media-container');
+      mediaContainer.innerHTML = `
+        <video class="video-player" controls preload="metadata" poster="${thumbnail || ''}">
+          <source src="${videoUrl}" type="video/mp4">
+          Your browser doesn't support video playback.
+        </video>
+      `;
+    }
+    
+    async function fetchVideo() {
+      const linkInput = document.getElementById('linkInput');
+      const fetchBtn = document.getElementById('fetchBtn');
+      const btnText = document.getElementById('btnText');
+      const resultContainer = document.getElementById('resultContainer');
+      const errorContainer = document.getElementById('errorContainer');
+      
+      const url = linkInput.value.trim();
+      
+      // Clear previous results
+      resultContainer.innerHTML = '';
+      errorContainer.innerHTML = '';
+      
+      if (!url) {
+        showError('Please enter a Terabox share URL');
+        return;
+      }
+      
+      // Loading state
+      fetchBtn.disabled = true;
+      btnText.innerHTML = '<span class="loading-spinner"></span>Fetching file...';
+      
+      try {
+        console.log('Making API request...');
+        
+        const response = await fetch(API_ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            link: url,
+            cookies: DEFAULT_NDUS
+          })
+        });
+        
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+          throw new Error(`Server error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('API Response:', data);
+        
+        if (!data.download_link || !data.file_name) {
+          throw new Error('File not found or invalid response');
+        }
+        
+        // Success - show result
+        const isVideo = isVideoFile(data.file_name);
+        const fileSize = data.file_size || 'Unknown size';
+        const videoUrl = data.proxy_url || data.download_link; // Use proxy URL if available
+        
+        let mediaSection = '';
+        if (data.thumbnail) {
+          if (isVideo) {
+            mediaSection = `
+              <div class="media-container">
+                <img src="${data.thumbnail}" alt="Thumbnail" class="thumbnail">
+                <div class="play-overlay" onclick="playVideo('${videoUrl}', '${data.thumbnail}')">
+                  <div class="play-icon"></div>
+                </div>
+              </div>
+            `;
+          } else {
+            mediaSection = `
+              <div class="media-container">
+                <img src="${data.thumbnail}" alt="Thumbnail" class="thumbnail">
+              </div>
+            `;
+          }
+        }
+        
+        const downloadSection = `
+          <div class="download-section">
+            <a href="${videoUrl}" class="download-btn primary" target="_blank" download>
+              Download
+            </a>
+            <button class="download-btn secondary" onclick="copyToClipboard('${videoUrl}')">
+              Copy Link
+            </button>
+          </div>
+        `;
+        
+        resultContainer.innerHTML = `
+          <div class="result-section" id="resultSection">
+            <div class="file-info">
+              <div class="file-name">${data.file_name}</div>
+              <div class="file-size">${fileSize}</div>
+            </div>
+            ${mediaSection}
+            ${downloadSection}
+          </div>
+        `;
+        
+        // Show result
+        setTimeout(() => {
+          document.getElementById('resultSection').classList.add('show');
+        }, 100);
+        
+      } catch (error) {
+        console.error('Error:', error);
+        
+        let errorMessage = 'An error occurred';
+        if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+          errorMessage = 'Network error - check your internet connection';
+        } else if (error.message.includes('404')) {
+          errorMessage = 'File not found - check your URL';
+        } else if (error.message.includes('500')) {
+          errorMessage = 'Server error - try again later';
+        } else {
+          errorMessage = error.message;
+        }
+        
+        showError(errorMessage);
+      } finally {
+        // Reset button
+        fetchBtn.disabled = false;
+        btnText.innerHTML = 'Find & Fetch File';
+      }
+    }
+    
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = 'Copied!';
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+        }, 2000);
+      });
+    }
+    
+    // Enter key support
+    document.getElementById('linkInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        fetchVideo();
+      }
+    });
+  </script>
+</body>
+</html>
