@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MaryaAi - AI Image & Video Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: #0a0a0a;
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      color: white;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    #particles-js {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    .container {
+      background: rgba(20, 20, 40, 0.9);
+      border-radius: 20px;
+      max-width: 900px;
+      width: 100%;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(45deg, #ff1744, #e91e63, #2196f3);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 15px;
+      font-size: 24px;
+      color: white;
+      font-weight: bold;
+    }
+
+    .header h1 {
+      font-size: 2.8em;
+      background: linear-gradient(45deg, #ff1744, #e91e63, #2196f3);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      color: #b3b3b3;
+      font-size: 1.1em;
+    }
+
+    /* Mode Toggle */
+    .mode-toggle {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 30px;
+      background: rgba(40, 40, 80, 0.6);
+      padding: 5px;
+      border-radius: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 12px 24px;
+      border: none;
+      background: transparent;
+      color: #b3b3b3;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .mode-btn.active {
+      background: linear-gradient(45deg, #ff1744, #e91e63, #2196f3);
+      color: white;
+    }
+
+    .mode-btn:hover:not(.active) {
+      color: white;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Content Sections */
+    .content-section {
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+
+    form {
+      width: 100%;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: white;
+      font-weight: 600;
+    }
+
+    textarea,
+    select,
+    input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      font-size: 16px;
+      background: rgba(30, 30, 60, 0.8);
+      color: white;
+      transition: all 0.3s;
+    }
+
+    textarea:focus,
+    select:focus,
+    input:focus {
+      border-color: #e91e63;
+      outline: none;
+      box-shadow: 0 0 15px rgba(233, 30, 99, 0.3);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    /* Model Selection */
+    .model-selection {
+      margin-bottom: 25px;
+    }
+
+    .model-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    .model-card {
+      background: rgba(40, 40, 80, 0.6);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .model-card:hover {
+      border-color: #e91e63;
+      transform: translateY(-2px);
+    }
+
+    .model-card.active {
+      border-color: #e91e63;
+      background: rgba(233, 30, 99, 0.2);
+      box-shadow: 0 0 20px rgba(233, 30, 99, 0.3);
+    }
+
+    .model-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(45deg, #ff1744, #e91e63, #2196f3);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      font-size: 24px;
+      color: white;
+    }
+
+    .model-card.active .model-icon {
+      background: linear-gradient(45deg, #ff4569, #ef4081, #42a5f5);
+      transform: scale(1.1);
+    }
+
+    .model-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 5px;
+    }
+
+    .model-description {
+      font-size: 14px;
+      color: #b3b3b3;
+      line-height: 1.4;
+    }
+
+    .model-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: linear-gradient(45deg, #ff1744, #e91e63);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      display: none;
+    }
+
+    .model-card.active .model-badge {
+      display: block;
+    }
+
+    /* Volume-style Image Count Selector */
+    .image-count-container {
+      margin-top: 15px;
+    }
+
+    .volume-selector {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 20px;
+      background: rgba(40, 40, 80, 0.6);
+      border-radius: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .volume-label {
+      font-weight: 600;
+      min-width: 120px;
+    }
+
+    .volume-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .volume-bars {
+      display: flex;
+      gap: 4px;
+      align-items: end;
+      height: 40px;
+    }
+
+    .volume-bar {
+      width: 8px;
+      background: #444;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .volume-bar:nth-child(1) { height: 15px; }
+    .volume-bar:nth-child(2) { height: 20px; }
+    .volume-bar:nth-child(3) { height: 25px; }
+    .volume-bar:nth-child(4) { height: 30px; }
+    .volume-bar:nth-child(5) { height: 35px; }
+    .volume-bar:nth-child(6) { height: 40px; }
+
+    .volume-bar.active {
+      background: linear-gradient(45deg, #ff1744, #e91e63, #2196f3);
+    }
+
+    .volume-count {
+      font-size: 18px;
+      font-weight: bold;
+      background: linear-gradient(45deg, #ff1744, #e91e63, #2196f3);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      min-width: 30px;
+    }
+
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .checkbox-wrapper {
+      position: relative;
+    }
+
+    .checkbox-wrapper input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin: 0;
+    }
+
+    .settings-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .settings-icon {
+      background: linear-gradient(45deg, #ff1744, #e91e63);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .settings-icon:hover {
+      background: linear-gradient(45deg, #ff4569, #ef4081);
+      transform: translateY(-2px);
+    }
+
+    .advanced-settings {
+      display: none;
+      margin-top: 20px;
+      padding: 20px;
+      background: rgba(40, 40, 80, 0.6);
+      border-radius: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .advanced-settings.show {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .volume-selector {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .model-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .generate-btn {
+      width: 100%;
+      background: linear-gradient(45deg, #ff1744, #e91e63, #2196f3);
+      color: white;
+      padding: 15px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: all 0.3s;
+      font-weight: 600;
+    }
+
+    .generate-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(233, 30, 99, 0.4);
+    }
+
+    .generate-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .result-container {
+      margin-top: 30px;
+    }
+
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .media-container {
+      position: relative;
+    }
+
+    /* Aspect ratio based containers */
+    .media-container.ratio-1-1 {
+      aspect-ratio: 1/1;
+    }
+
+    .media-container.ratio-3-2 {
+      aspect-ratio: 3/2;
+    }
+
+    .media-container.ratio-16-9 {
+      aspect-ratio: 16/9;
+    }
+
+    .media-container.ratio-2-3 {
+      aspect-ratio: 2/3;
+    }
+
+    .media-container.ratio-9-16 {
+      aspect-ratio: 9/16;
+    }
+
+    .media-placeholder {
+      width: 100%;
+      height: 100%;
+      background: #2a2a2a;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      border: 2px dashed #555;
+    }
+
+    .placeholder-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .placeholder-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      border-top: 3px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .timer-display {
+      font-family: 'Courier New', monospace;
+      font-size: 16px;
+      color: white;
+      font-weight: bold;
+      background: transparent;
+      padding: 5px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(5px);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .generated-image, .generated-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 15px;
+      display: none;
+    }
+
+    .video-controls {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      z-index: 10;
+    }
+
+    .play-btn {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(45deg, #ff1744, #e91e63, #2196f3);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .play-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(233, 30, 99, 0.5);
+    }
+
+    .download-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: linear-gradient(45deg, #ff1744, #e91e63);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      gap: 5px;
+      font-size: 14px;
+      transition: all 0.3s;
+      z-index: 10;
+    }
+
+    .download-btn:hover {
+      background: linear-gradient(45deg, #ff4569, #ef4081);
+      transform: scale(1.05);
+    }
+
+    .error-message {
+      background: rgba(255, 23, 68, 0.2);
+      color: #ff1744;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 20px 0;
+      border: 1px solid #ff1744;
+      display: none;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px 10px;
+      font-size: 0.9em;
+      color: #888;
+      margin-top: 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .status-text {
+      text-align: center;
+      margin: 20px 0;
+      color: #b3b3b3;
+      display: none;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 20px 0;
+      display: none;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(45deg, #ff1744, #e91e63, #2196f3);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Video specific styles */
+    .video-container {
+      position: relative;
+      aspect-ratio: 16/9;
+    }
+
+    /* Form visibility */
+    .maryav1-form, .ximsm-form {
+      display: none;
+    }
+
+    .maryav1-form.active, .ximsm-form.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+  
+  <div class="container">
+    <div class="header">
+      <div class="logo">MA</div>
+      <h1>MaryaAi</h1>
+      <p>Create stunning AI‑generated images & videos with advanced customization</p>
+    </div>
+    
+    <!-- Mode Toggle -->
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="imageMode">
+        <i class="fas fa-image"></i>
+        Image Generation
+      </button>
+      <button class="mode-btn" id="videoMode">
+        <i class="fas fa-video"></i>
+        Video Generation
+      </button>
+    </div>
+    
+    <!-- Image Generation Section -->
+    <div class="content-section active" id="imageSection">
+      <!-- Model Selection -->
+      <div class="form-group model-selection">
+        <label>Select AI Model</label>
+        <div class="model-cards">
+          <div class="model-card active" data-model="maryav1">
+            <div class="model-badge">SELECTED</div>
+            <div class="model-icon">
+              <i class="fas fa-robot"></i>
+            </div>
+            <div class="model-name">MaryaV1</div>
+            <div class="model-description">Advanced model with superior quality and detail generation</div>
+          </div>
+          <div class="model-card" data-model="ximsm">
+            <div class="model-badge">SELECTED</div>
+            <div class="model-icon">
+              <i class="fas fa-magic"></i>
+            </div>
+            <div class="model-name">XiMSM</div>
+            <div class="model-description">High-speed model with NSFW filtering and optimized performance</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MaryaV1 Form -->
+      <form id="maryav1Form" class="maryav1-form active">
+        <div class="form-group">
+          <label for="maryaPrompt">Prompt *</label>
+          <textarea id="maryaPrompt" placeholder="Describe the image you want to create..." required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="maryaNegativePrompt">Negative Prompt</label>
+          <textarea id="maryaNegativePrompt" placeholder="What to avoid in the image...">lowres, bad anatomy, bad hands, text, error, missing finger, extra digits, fewer digits, cropped, worst quality, low quality, low score, bad score, average score, signature, watermark, username, blurry</textarea>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="maryaStyle">Style</label>
+            <select id="maryaStyle">
+              <option value="real">Realistic</option>
+              <option value="anime">Anime</option>
+              <option value="photo">Photographic</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="maryaSize">Aspect Ratio</label>
+            <select id="maryaSize">
+              <option value="1:1">1:1 Square</option>
+              <option value="3:2">3:2 Landscape</option>
+              <option value="16:9">16:9 Wide</option>
+              <option value="2:3">2:3 Portrait</option>
+              <option value="9:16">9:16 Tall</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="image-count-container">
+          <div class="volume-selector">
+            <div class="volume-label">Number of Images:</div>
+            <div class="volume-controls">
+              <div class="volume-bars" id="maryaVolumeBars">
+                <div class="volume-bar active" data-count="1"></div>
+                <div class="volume-bar active" data-count="2"></div>
+                <div class="volume-bar active" data-count="3"></div>
+                <div class="volume-bar" data-count="4"></div>
+                <div class="volume-bar" data-count="5"></div>
+              </div>
+              <div class="volume-count" id="maryaVolumeCount">3</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="settings-toggle">
+          <button type="button" class="settings-icon" id="maryaAdvancedToggle">
+            <i class="fas fa-cog"></i>
+            Advanced Settings
+          </button>
+        </div>
+        
+        <div class="advanced-settings" id="maryaAdvancedSettings">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="maryaGuidanceScale">Guidance Scale</label>
+              <input type="number" id="maryaGuidanceScale" min="0" max="20" step="0.1" value="7">
+            </div>
+            <div class="form-group">
+              <label for="maryaInferenceSteps">Inference Steps</label>
+              <input type="number" id="maryaInferenceSteps" min="1" max="28" value="28">
+            </div>
+          </div>
+        </div>
+        
+        <button type="submit" class="generate-btn" id="maryaGenerateBtn">
+          <i class="fas fa-magic"></i> Generate Images
+        </button>
+      </form>
+
+      <!-- XiMSM Form -->
+      <form id="ximsmForm" class="ximsm-form">
+        <div class="form-group">
+          <label for="ximsmPrompt">Prompt *</label>
+          <textarea id="ximsmPrompt" placeholder="Describe the image you want to generate..." required></textarea>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="ximsmDimensions">Dimensions *</label>
+            <select id="ximsmDimensions" required>
+              <option value="1:1">Square (1024x1024)</option>
+              <option value="1:2">Portrait (512x1024)</option>
+              <option value="3:2">Landscape (768x512)</option>
+              <option value="3:4">Portrait (768x1024)</option>
+              <option value="16:9">Widescreen (1024x576)</option>
+              <option value="9:16">Mobile (576x1024)</option>
+              <option value="tall">Tall (576x1024)</option>
+              <option value="wide">Wide (1024x576)</option>
+              <option value="square">Square (1024x1024)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Safety Settings</label>
+            <div class="checkbox-container">
+              <div class="checkbox-wrapper">
+                <input type="checkbox" id="ximsmSafety" checked>
+              </div>
+              <label for="ximsmSafety">Enable Safety Filter (NSFW Protection)</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="image-count-container">
+          <div class="volume-selector">
+            <div class="volume-label">Number of Images:</div>
+            <div class="volume-controls">
+              <div class="volume-bars" id="ximsmVolumeBars">
+                <div class="volume-bar active" data-count="1"></div>
+                <div class="volume-bar active" data-count="2"></div>
+                <div class="volume-bar active" data-count="3"></div>
+                <div class="volume-bar" data-count="4"></div>
+                <div class="volume-bar" data-count="5"></div>
+                <div class="volume-bar" data-count="6"></div>
+              </div>
+              <div class="volume-count" id="ximsmVolumeCount">3</div>
+            </div>
+          </div>
+        </div>
+        
+        <button type="submit" class="generate-btn" id="ximsmGenerateBtn">
+          <i class="fas fa-magic"></i> Generate Images
+        </button>
+      </form>
+    </div>
+    
+    <!-- Video Generation Section -->
+    <div class="content-section" id="videoSection">
+      <form id="videoGenerateForm">
+        <div class="form-group">
+          <label for="videoPrompt">Video Prompt *</label>
+          <textarea id="videoPrompt" placeholder="Describe the video you want to create... (e.g., 'A cat running in a garden, beautiful sunset background')" required></textarea>
+        </div>
+        
+        <button type="submit" class="generate-btn" id="videoGenerateBtn">
+          <i class="fas fa-video"></i> Generate Video
+        </button>
+      </form>
+    </div>
+    
+    <div class="progress-bar" id="progressBar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="status-text" id="statusText"></div>
+    <div class="error-message" id="errorMessage"></div>
+    
+    <div class="result-container" id="resultContainer">
+      <div class="media-grid" id="mediaGrid">
+        <!-- Dynamic media containers will be added here -->
+      </div>
+    </div>
+    
+    <div class="footer">
+      Made by MSM |Powered by BTF Group
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script>
+    // Particles.js configuration
+    particlesJS('particles-js', {
+      particles: {
+        number: { value: 80, density: { enable: true, value_area: 800 } },
+        color: { value: ['#ff1744', '#e91e63', '#2196f3'] },
+        shape: { type: 'circle' },
+        opacity: { value: 0.5, random: false },
+        size: { value: 3, random: true },
+        line_linked: {
+          enable: true,
+          distance: 150,
+          color: '#e91e63',
+          opacity: 0.4,
+          width: 1
+        },
+        move: {
+          enable: true,
+          speed: 2,
+          direction: 'none',
+          random: false,
+          straight: false,
+          out_mode: 'out',
+          bounce: false
+        }
+      },
+      interactivity: {
+        detect_on: 'canvas',
+        events: {
+          onhover: { enable: true, mode: 'repulse' },
+          onclick: { enable: true, mode: 'push' },
+          resize: true
+        }
+      },
+      retina_detect: true
+    });
+
+    let selectedMaryaImageCount = 3;
+    let selectedXimsmImageCount = 3;
+    let currentMode = 'image';
+    let selectedModel = 'maryav1';
+    let timers = {};
+
+    // Model Selection
+    const modelCards = document.querySelectorAll('.model-card');
+    modelCards.forEach(card => {
+      card.addEventListener('click', () => {
+        // Remove active class from all cards
+        modelCards.forEach(c => c.classList.remove('active'));
+        
+        // Add active class to clicked card
+        card.classList.add('active');
+        
+        // Set selected model
+        selectedModel = card.dataset.model;
+        
+        // Show/hide appropriate forms
+        document.querySelectorAll('.maryav1-form, .ximsm-form').forEach(form => {
+          form.classList.remove('active');
+        });
+        
+        if (selectedModel === 'maryav1') {
+          document.querySelector('.maryav1-form').classList.add('active');
+        } else {
+          document.querySelector('.ximsm-form').classList.add('active');
+        }
+      });
+    });
+
+    // Mode Toggle
+    document.getElementById('imageMode').addEventListener('click', () => {
+      switchMode('image');
+    });
+
+    document.getElementById('videoMode').addEventListener('click', () => {
+      switchMode('video');
+    });
+
+    function switchMode(mode) {
+      currentMode = mode;
+      
+      // Update buttons
+      document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(mode + 'Mode').classList.add('active');
+      
+      // Update sections
+      document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+      document.getElementById(mode + 'Section').classList.add('active');
+      
+      // Clear previous results
+      document.getElementById('mediaGrid').innerHTML = '';
+      document.getElementById('statusText').style.display = 'none';
+      document.getElementById('progressBar').style.display = 'none';
+      document.getElementById('errorMessage').style.display = 'none';
+    }
+
+    // Volume-style image count selector for MaryaV1
+    const maryaVolumeBars = document.querySelectorAll('#maryaVolumeBars .volume-bar');
+    const maryaVolumeCount = document.getElementById('maryaVolumeCount');
+
+    maryaVolumeBars.forEach((bar, index) => {
+      bar.addEventListener('click', () => {
+        const count = index + 1;
+        selectedMaryaImageCount = count;
+        maryaVolumeCount.textContent = count;
+        
+        // Update active bars
+        maryaVolumeBars.forEach((b, i) => {
+          if (i < count) {
+            b.classList.add('active');
+          } else {
+            b.classList.remove('active');
+          }
+        });
+      });
+    });
+
+    // Volume-style image count selector for XiMSM
+    const ximsmVolumeBars = document.querySelectorAll('#ximsmVolumeBars .volume-bar');
+    const ximsmVolumeCount = document.getElementById('ximsmVolumeCount');
+
+    ximsmVolumeBars.forEach((bar, index) => {
+      bar.addEventListener('click', () => {
+        const count = index + 1;
+        selectedXimsmImageCount = count;
+        ximsmVolumeCount.textContent = count;
+        
+        // Update active bars
+        ximsmVolumeBars.forEach((b, i) => {
+          if (i < count) {
+            b.classList.add('active');
+          } else {
+            b.classList.remove('active');
+          }
+        });
+      });
+    });
+
+    // Advanced settings toggle for MaryaV1
+    document.getElementById('maryaAdvancedToggle').addEventListener('click', () => {
+      const settings = document.getElementById('maryaAdvancedSettings');
+      settings.classList.toggle('show');
+    });
+
+    // Timer functions
+    function startTimer(index) {
+      const startTime = Date.now();
+      timers[index] = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        const timerElement = document.getElementById(`timer${index}`);
+        if (timerElement) {
+          timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+      }, 1000);
+    }
+
+    function stopTimer(index) {
+      if (timers[index]) {
+        clearInterval(timers[index]);
+        delete timers[index];
+      }
+    }
+
+    // Get aspect ratio class
+    function getAspectRatioClass(aspectRatio) {
+      const ratioMap = {
+        '1:1': 'ratio-1-1', 'square': 'ratio-1-1',
+        '3:2': 'ratio-3-2', 'wide': 'ratio-16-9',
+        '16:9': 'ratio-16-9',
+        '2:3': 'ratio-2-3', '3:4': 'ratio-2-3',
+        '9:16': 'ratio-9-16', '1:2': 'ratio-9-16', 'tall': 'ratio-9-16'
+      };
+      return ratioMap[aspectRatio] || 'ratio-1-1';
+    }
+
+    // Create image containers dynamically
+    function createImageContainers(count, aspectRatio = '1:1') {
+      const mediaGrid = document.getElementById('mediaGrid');
+      const ratioClass = getAspectRatioClass(aspectRatio);
+      
+      mediaGrid.innerHTML = '';
+
+      for (let i = 1; i <= count; i++) {
+        const container = document.createElement('div');
+        container.className = `media-container ${ratioClass}`;
+        container.innerHTML = `
+          <div class="media-placeholder" id="placeholder${i}">
+            <div class="placeholder-content">
+              <div class="placeholder-spinner"></div>
+              <div class="timer-display" id="timer${i}">00:00</div>
+            </div>
+          </div>
+          <img class="generated-image" id="image${i}">
+          <button class="download-btn" id="download${i}">
+            <i class="fas fa-download"></i> Download
+          </button>
+        `;
+        mediaGrid.appendChild(container);
+
+        // Setup download functionality
+        document.getElementById(`download${i}`).addEventListener('click', () => {
+          const img = document.getElementById(`image${i}`);
+          const link = document.createElement('a');
+          link.href = img.src;
+          link.download = `maryaai-${selectedModel}-${Date.now()}-${i}.png`;
+          link.click();
+        });
+      }
+    }
+
+    // Create video container with fixed controls
+    function createVideoContainer() {
+      const mediaGrid = document.getElementById('mediaGrid');
+      mediaGrid.innerHTML = '';
+
+      const container = document.createElement('div');
+      container.className = 'media-container video-container';
+      container.innerHTML = `
+        <div class="media-placeholder" id="videoPlaceholder">
+          <div class="placeholder-content">
+            <div class="placeholder-spinner"></div>
+            <div class="timer-display" id="videoTimer">00:00</div>
+          </div>
+        </div>
+        <video class="generated-video" id="generatedVideo" style="display: none;" muted>
+          Your browser does not support the video tag.
+        </video>
+        <div class="video-controls" id="videoControls">
+          <button class="play-btn" id="playBtn">
+            <i class="fas fa-play"></i>
+          </button>
+        </div>
+        <button class="download-btn" id="videoDownload">
+          <i class="fas fa-download"></i> Download
+        </button>
+      `;
+      mediaGrid.appendChild(container);
+
+      // Setup video controls
+      const video = document.getElementById('generatedVideo');
+      const playBtn = document.getElementById('playBtn');
+      const videoControls = document.getElementById('videoControls');
+
+      video.addEventListener('loadedmetadata', () => {
+        videoControls.style.display = 'block';
+      });
+
+      playBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (video.paused) {
+          video.play();
+          playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+          videoControls.style.display = 'none';
+        } else {
+          video.pause();
+          playBtn.innerHTML = '<i class="fas fa-play"></i>';
+          videoControls.style.display = 'block';
+        }
+      });
+
+      video.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (video.paused) {
+          video.play();
+          playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+          videoControls.style.display = 'none';
+        } else {
+          video.pause();
+          playBtn.innerHTML = '<i class="fas fa-play"></i>';
+          videoControls.style.display = 'block';
+        }
+      });
+
+      video.addEventListener('pause', () => {
+        playBtn.innerHTML = '<i class="fas fa-play"></i>';
+        videoControls.style.display = 'block';
+      });
+
+      video.addEventListener('play', () => {
+        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+        setTimeout(() => {
+          if (!video.paused) {
+            videoControls.style.display = 'none';
+          }
+        }, 1000);
+      });
+
+      video.addEventListener('ended', () => {
+        playBtn.innerHTML = '<i class="fas fa-replay"></i>';
+        videoControls.style.display = 'block';
+      });
+
+      // Setup direct download functionality
+      document.getElementById('videoDownload').addEventListener('click', async (e) => {
+        e.stopPropagation();
+        try {
+          const response = await fetch(video.src);
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `maryaai-video-${Date.now()}.mp4`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        } catch (err) {
+          console.error('Download failed:', err);
+          // Fallback to opening in new tab
+          window.open(video.src, '_blank');
+        }
+      });
+    }
+
+    // MaryaV1 form submission
+    document.getElementById('maryav1Form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const btn = document.getElementById('maryaGenerateBtn');
+      const error = document.getElementById('errorMessage');
+      const status = document.getElementById('statusText');
+      const progressBar = document.getElementById('progressBar');
+      const progressFill = document.getElementById('progressFill');
+      
+      // Create image containers
+      const aspectRatio = document.getElementById('maryaSize').value;
+      createImageContainers(selectedMaryaImageCount, aspectRatio);
+      
+      // Reset UI
+      error.style.display = 'none';
+      status.style.display = 'block';
+      progressBar.style.display = 'block';
+      status.textContent = `Generating ${selectedMaryaImageCount} images with MaryaV1...`;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+
+      // Show placeholders and start timers
+      for (let i = 1; i <= selectedMaryaImageCount; i++) {
+        const placeholder = document.getElementById(`placeholder${i}`);
+        const image = document.getElementById(`image${i}`);
+        const downloadBtn = document.getElementById(`download${i}`);
+        
+        placeholder.style.display = 'flex';
+        image.style.display = 'none';
+        downloadBtn.style.display = 'none';
+        startTimer(i);
+      }
+
+      // API payload for MaryaV1
+      const payload = {
+        prompt: document.getElementById('maryaPrompt').value,
+        negative_prompt: document.getElementById('maryaNegativePrompt').value,
+        style: document.getElementById('maryaStyle').value,
+        size: document.getElementById('maryaSize').value,
+        guidance_scale: parseFloat(document.getElementById('maryaGuidanceScale').value),
+        inference_steps: parseInt(document.getElementById('maryaInferenceSteps').value)
+      };
+
+      try {
+        const promises = [];
+        
+        for (let i = 0; i < selectedMaryaImageCount; i++) {
+          promises.push(
+            fetch('https://ar-genai.pages.dev/generate', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify(payload)
+            })
+          );
+        }
+
+        const responses = await Promise.all(promises);
+        
+        responses.forEach((resp, index) => {
+          if (!resp.ok) throw new Error(`HTTP ${resp.status} for image ${index + 1}`);
+        });
+
+        const blobs = await Promise.all(responses.map(resp => resp.blob()));
+        
+        blobs.forEach((blob, index) => {
+          const url = URL.createObjectURL(blob);
+          const imageId = `image${index + 1}`;
+          const placeholderId = `placeholder${index + 1}`;
+          const downloadId = `download${index + 1}`;
+          
+          const img = document.getElementById(imageId);
+          const placeholder = document.getElementById(placeholderId);
+          const downloadBtn = document.getElementById(downloadId);
+          
+          img.src = url;
+          img.style.display = 'block';
+          placeholder.style.display = 'none';
+          downloadBtn.style.display = 'flex';
+          stopTimer(index + 1);
+        });
+
+        progressFill.style.width = '100%';
+        status.textContent = `All ${selectedMaryaImageCount} images generated successfully with MaryaV1!`;
+        setTimeout(() => { 
+          status.style.display = 'none'; 
+          progressBar.style.display = 'none';
+        }, 3000);
+        
+      } catch (err) {
+        error.textContent = `Failed to generate images: ${err.message}`;
+        error.style.display = 'block';
+        status.style.display = 'none';
+        progressBar.style.display = 'none';
+        
+        for (let i = 1; i <= selectedMaryaImageCount; i++) {
+          stopTimer(i);
+          const placeholder = document.getElementById(`placeholder${i}`);
+          if (placeholder) placeholder.style.display = 'none';
+        }
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-magic"></i> Generate Images';
+      }
+    });
+
+    // XiMSM form submission
+    document.getElementById('ximsmForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const btn = document.getElementById('ximsmGenerateBtn');
+      const error = document.getElementById('errorMessage');
+      const status = document.getElementById('statusText');
+      const progressBar = document.getElementById('progressBar');
+      const progressFill = document.getElementById('progressFill');
+      
+      const prompt = document.getElementById('ximsmPrompt').value;
+      const dimensions = document.getElementById('ximsmDimensions').value;
+      const safety = document.getElementById('ximsmSafety').checked;
+      const steps = 4; // Fixed to 4
+      
+      // Create image containers
+      createImageContainers(selectedXimsmImageCount, dimensions);
+      
+      // Reset UI
+      error.style.display = 'none';
+      status.style.display = 'block';
+      progressBar.style.display = 'block';
+      status.textContent = `Generating ${selectedXimsmImageCount} images with XiMSM...`;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+
+      // Show placeholders and start timers
+      for (let i = 1; i <= selectedXimsmImageCount; i++) {
+        const placeholder = document.getElementById(`placeholder${i}`);
+        const image = document.getElementById(`image${i}`);
+        const downloadBtn = document.getElementById(`download${i}`);
+        
+        placeholder.style.display = 'flex';
+        image.style.display = 'none';
+        downloadBtn.style.display = 'none';
+        startTimer(i);
+      }
+
+      try {
+        // Using GET request by default
+        const url = new URL('https://death-image.ashlynn.workers.dev/generate');
+        url.searchParams.append('prompt', prompt);
+        url.searchParams.append('image', selectedXimsmImageCount.toString());
+        url.searchParams.append('dimensions', dimensions);
+        url.searchParams.append('safety', safety.toString());
+        url.searchParams.append('steps', steps.toString());
+        
+        const response = await fetch(url.toString());
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: Failed to generate images`);
+        }
+
+        const result = await response.json();
+        
+        if (result.error) {
+          throw new Error(result.error);
+        }
+
+        if (result.images && Array.isArray(result.images)) {
+          // Display images from URLs
+          result.images.forEach((imageUrl, index) => {
+            const imageId = `image${index + 1}`;
+            const placeholderId = `placeholder${index + 1}`;
+            const downloadId = `download${index + 1}`;
+            
+            const img = document.getElementById(imageId);
+            const placeholder = document.getElementById(placeholderId);
+            const downloadBtn = document.getElementById(downloadId);
+            
+            if (img && placeholder && downloadBtn) {
+              img.src = imageUrl;
+              img.style.display = 'block';
+              placeholder.style.display = 'none';
+              downloadBtn.style.display = 'flex';
+              stopTimer(index + 1);
+              
+              // Update download functionality for URL-based images with direct download
+              downloadBtn.onclick = async (e) => {
+                e.stopPropagation();
+                try {
+                  const imgResponse = await fetch(imageUrl);
+                  const blob = await imgResponse.blob();
+                  const url = URL.createObjectURL(blob);
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.download = `maryaai-ximsm-${Date.now()}-${index + 1}.png`;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  URL.revokeObjectURL(url);
+                } catch (err) {
+                  console.error('Download failed:', err);
+                }
+              };
+            }
+          });
+
+          progressFill.style.width = '100%';
+          status.textContent = `All ${selectedXimsmImageCount} images generated successfully with XiMSM!`;
+          setTimeout(() => { 
+            status.style.display = 'none'; 
+            progressBar.style.display = 'none';
+          }, 3000);
+        } else {
+          throw new Error('Invalid response format from XiMSM API');
+        }
+        
+      } catch (err) {
+        error.textContent = `Failed to generate images: ${err.message}`;
+        error.style.display = 'block';
+        status.style.display = 'none';
+        progressBar.style.display = 'none';
+        
+        for (let i = 1; i <= selectedXimsmImageCount; i++) {
+          stopTimer(i);
+          const placeholder = document.getElementById(`placeholder${i}`);
+          if (placeholder) placeholder.style.display = 'none';
+        }
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-magic"></i> Generate Images';
+      }
+    });
+
+    // Video generation form submission
+    document.getElementById('videoGenerateForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const btn = document.getElementById('videoGenerateBtn');
+      const error = document.getElementById('errorMessage');
+      const status = document.getElementById('statusText');
+      const progressBar = document.getElementById('progressBar');
+      const progressFill = document.getElementById('progressFill');
+      const prompt = document.getElementById('videoPrompt').value;
+      
+      createVideoContainer();
+      
+      error.style.display = 'none';
+      status.style.display = 'block';
+      progressBar.style.display = 'block';
+      status.textContent = 'Generating video, please wait...';
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+
+      const placeholder = document.getElementById('videoPlaceholder');
+      const video = document.getElementById('generatedVideo');
+      const videoControls = document.getElementById('videoControls');
+      const downloadBtn = document.getElementById('videoDownload');
+      
+      placeholder.style.display = 'flex';
+      video.style.display = 'none';
+      videoControls.style.display = 'none';
+      downloadBtn.style.display = 'none';
+      startTimer('video');
+
+      try {
+        const response = await fetch(`https://api.yabes-desu.workers.dev/ai/tool/txt2video?prompt=${encodeURIComponent(prompt)}`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: Failed to generate video`);
+        }
+
+        const result = await response.json();
+        
+        if (result.error) {
+          throw new Error(result.error);
+        }
+
+        if (result.video_url || result.url || result.result) {
+          const videoUrl = result.video_url || result.url || result.result;
+          
+          video.src = videoUrl;
+          video.style.display = 'block';
+          placeholder.style.display = 'none';
+          downloadBtn.style.display = 'flex';
+          stopTimer('video');
+          
+          progressFill.style.width = '100%';
+          status.textContent = 'Video generated successfully!';
+          
+          setTimeout(() => { 
+            status.style.display = 'none'; 
+            progressBar.style.display = 'none';
+          }, 3000);
+        } else {
+          throw new Error('Invalid response format from video API');
+        }
+        
+      } catch (err) {
+        error.textContent = `Failed to generate video: ${err.message}`;
+        error.style.display = 'block';
+        status.style.display = 'none';
+        progressBar.style.display = 'none';
+        
+        stopTimer('video');
+        placeholder.style.display = 'none';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-video"></i> Generate Video';
+      }
+    });
+  </script>
+</body>
+</html>
