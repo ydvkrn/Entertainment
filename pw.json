@@ -1,12 +1,37 @@
 {
-  "videos": {
-    "MSM01": "177qEHAsZsc0NoN2_zwip055-k6V84xxz",
-    "MSM02": "1abc123def456ghi789jkl012mno345pqr",
-    "MSM03": "1xyz789abc123def456ghi012jkl345mno"
-  },
-  "apiKeys": [
-    "AIzaSyCqWtwWgknS3ZHfUPrlqGTbxpqdQ90Bmk8",
-    "AIzaSyCJu48v4dXgaCnC7_dqy49tHFE9Qfrkhb8",
-    "AIzaSyCqgUASJXlmZ_GDQ_Kaf4sixOFJV0blbOw"
+  "title": "The BTF Worlds",
+  "subtitle": "Mia Khalifa",
+  "cards": [
+    {
+      "id": "study",
+      "label": "Study",
+      "theme": ["#8b5cf6", "#3b82f6", "#f43f5e"],
+      "logo": { "type": "img", "src": "assets/logos/study.png", "alt": "Study" }
+    },
+    {
+      "id": "terabox",
+      "label": "Terabox Downloader",
+      "theme": ["#06b6d4", "#22c55e", "#3b82f6"],
+      "logo": { "type": "img", "src": "assets/logos/terabox.png", "alt": "Terabox Downloader" }
+    },
+    {
+      "id": "instagram",
+      "label": "Instagram Downloader",
+      "theme": ["#f43f5e", "#f59e0b", "#ef4444"],
+      "logo": { "type": "img", "src": "assets/logos/instagram.png", "alt": "Instagram Downloader" }
+    },
+    {
+      "id": "maryaai",
+      "label": "MaryaAi",
+      "theme": ["#f59e0b", "#fde047", "#fb923c"],
+      "logo": { "type": "img", "src": "assets/logos/maryaai.png", "alt": "MaryaAi" }
+    },
+    {
+      "id": "tools",
+      "label": "Tools",
+      "theme": ["#6366f1", "#8b5cf6", "#a855f7"],
+      "logo": { "type": "img", "src": "assets/logos/tools.png", "alt": "Tools" }
+
+    }
   ]
 }
