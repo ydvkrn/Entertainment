@@ -1,12 +1,12 @@
 {
   "title": "The BTF Worlds",
-  "subtitle": "Mia Khalifa",
+  "subtitle": "Use & Rate My Work",
   "cards": [
     {
       "id": "study",
       "label": "Study",
       "theme": ["#8b5cf6", "#3b82f6", "#f43f5e"],
-      "logo": { "type": "img", "src": "assets/logos/study.png", "alt": "Study" }
+      "logo": { "type": "img", "src": "https://i.postimg.cc/6pzw8vB8/download-3.png", "alt": "Study" }
     },
     {
       "id": "terabox",
@@ -24,7 +24,7 @@
       "id": "maryaai",
       "label": "MaryaAi",
       "theme": ["#f59e0b", "#fde047", "#fb923c"],
-      "logo": { "type": "img", "src": "assets/logos/maryaai.png", "alt": "MaryaAi" }
+      "logo": { "type": "img", "src": "https://i.postimg.cc/xjb0683Z/1000083948-removebg-preview.png", "alt": "MaryaAi" }
     },
     {
       "id": "tools",
