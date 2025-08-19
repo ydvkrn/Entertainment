@@ -1,6 +1,6 @@
 {
   "name": "My Sample PDF",
-  "thumbnail": "https://example.com/thumbnail.jpg",
+  "thumbnail": "https://i.postimg.cc/kg8W91Dz/1000085550-removebg-preview.png",
   "pdfDataUri": "data:application/pdf;base64,...",  /* या */
-  "pdfUrl": "https://example.com/sample.pdf"
+  "pdfUrl": "https://fantastic-cockroach.static.domains/90a0cd7ce7b1d8fc9c4429a6c3d18484.pdf"
 }
