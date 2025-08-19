@@ -1,0 +1,6 @@
+{
+  "name": "My Sample PDF",
+  "thumbnail": "https://example.com/thumbnail.jpg",
+  "pdfDataUri": "data:application/pdf;base64,...",  /* या */
+  "pdfUrl": "https://example.com/sample.pdf"
+}
