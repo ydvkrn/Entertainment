@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Advanced PDF Viewer from JSON URL</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f8fafc;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+  #pdfInfo {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  #pdfInfo h2 {
+    margin: 0;
+    color: #2c3e50;
+  }
+  #thumbnail {
+    width: 160px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+  }
+  #thumbnail:hover {
+    transform: scale(1.05);
+  }
+  #viewerContainer {
+    width: 80vw;
+    max-width: 960px;
+    flex-grow: 1;
+    margin-top: 20px;
+    border-radius: 6px;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.2);
+    overflow: hidden;
+    display: none;
+  }
+  iframe#pdfViewer {
+    width: 100%;
+    height: 80vh;
+    border: none;
+    display: block;
+  }
+  #loader {
+    margin-top: 40px;
+    font-size: 18px;
+    color: #555;
+  }
+</style>
+</head>
+<body>
+
+<div id="pdfInfo" style="display:none;">
+  <img id="thumbnail" alt="PDF Thumbnail" />
+  <h2 id="pdfName"></h2>
+  <p>Click on the thumbnail to view the PDF below</p>
+</div>
+
+<div id="loader">Loading PDF data...</div>
+
+<div id="viewerContainer">
+  <iframe id="pdfViewer" title="PDF Viewer"></iframe>
+</div>
+
+<script>
+  const jsonUrl = 'https://raw.githubusercontent.com/ydvkrn/Entertainment/refs/heads/main/ok.json';  // यहाँ अपनी JSON लिंक डालें
+
+  async function loadPdfData() {
+    try {
+      const response = await fetch(jsonUrl);
+      if (!response.ok) throw new Error('Network response was not ok');
+      const pdfJson = await response.json();
+
+      // Hide loader, show pdf info
+      document.getElementById('loader').style.display = 'none';
+      const infoDiv = document.getElementById('pdfInfo');
+      infoDiv.style.display = 'block';
+
+      // Set PDF name and thumbnail
+      document.getElementById('pdfName').textContent = pdfJson.name || 'Unnamed PDF';
+      document.getElementById('thumbnail').src = pdfJson.thumbnail;
+
+      // On thumbnail click, show PDF viewer iframe
+      document.getElementById('thumbnail').onclick = () => {
+        const viewerContainer = document.getElementById('viewerContainer');
+        viewerContainer.style.display = 'block';
+
+        // If PDF data uri present, use it, else use URL
+        const pdfSrc = pdfJson.pdfDataUri || pdfJson.pdfUrl;
+        if (!pdfSrc) {
+          alert('PDF source not found in JSON');
+          return;
+        }
+        document.getElementById('pdfViewer').src = pdfSrc;
+
+        // Scroll to viewer (optional)
+        viewerContainer.scrollIntoView({ behavior: 'smooth' });
+      };
+
+    } catch (error) {
+      document.getElementById('loader').textContent = 'Failed to load PDF data.';
+      console.error('Error loading JSON:', error);
+    }
+  }
+
+  loadPdfData();
+</script>
+
+</body>
+</html>
